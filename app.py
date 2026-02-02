@@ -90,8 +90,8 @@ def main():
         file_name = "B.Sc Quotations.xlsx" if course == "BSC" else "GNM Quotation.xlsx"
         try:
             df = pd.read_excel(file_name, header=None)
-        except Exception as e:
-            st.error(f"Could not find {file_name}. Please ensure it is uploaded to your GitHub folder.")
+        except Exception:
+            st.error(f"Could not find {file_name}. Ensure it's in your GitHub repo.")
             return
 
         # 2. Extract Data
@@ -124,15 +124,17 @@ def main():
                 quotation_data.append((sem, current_sem_books))
 
         if not quotation_data:
-            st.error("No data found for the semesters provided. Check your spelling!")
+            st.error("No data found for the semesters provided.")
             return
 
         # 3. Create PDF
         pdf = FrontlineQuotation()
         pdf.add_page()
         
-        # Border Boxes for Principal & Date
+        # --- BORDER BOXES START ---
         start_y = pdf.get_y()
+        
+        # Left Box (Principal)
         pdf.rect(10, start_y, 130, 25) 
         pdf.set_xy(12, start_y + 2)
         pdf.set_font('Arial', '', 10)
@@ -140,14 +142,17 @@ def main():
         pdf.set_x(12); pdf.set_font('Arial', 'B', 11); pdf.set_text_color(0, 51, 102) 
         pdf.cell(100, 6, clean_text(college), ln=True) 
         pdf.set_text_color(0, 0, 0); pdf.set_font('Arial', '', 10); pdf.set_x(12)
-        pdf.cell(100, 5, f"{clean_text(location)} - {clean_text(phone)}", ln=True)
+        pdf.cell(100, 5, f"{clean_text(location)}", ln=True)
+        pdf.set_x(12); pdf.cell(100, 5, f"{clean_text(phone)}", ln=True)
 
+        # Right Box (Date)
         pdf.rect(140, start_y, 60, 25)
         pdf.set_xy(142, start_y + 2); pdf.set_font('Arial', 'B', 10)
         pdf.cell(55, 10, f"Date: {datetime.now().strftime('%d-%m-%y')}", ln=True)
         pdf.set_x(142); pdf.cell(55, 5, f"Quotation: {datetime.now().strftime('%y-%m-%d-%H')}", ln=True)
         
         pdf.set_y(start_y + 30)
+        # --- BORDER BOXES END ---
 
         # Table Header
         pdf.set_fill_color(0, 51, 102); pdf.set_text_color(255, 255, 255); pdf.set_font('Arial', 'B', 9)
